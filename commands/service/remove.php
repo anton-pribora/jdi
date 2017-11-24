@@ -3,19 +3,18 @@
 /* @var $this ApCode\Executor\RuntimeInterface */
 $onlyCommands = $this->param(0) == '-c' || !posix_isatty(STDOUT);
 
-$cronFile = ExpandPath(Config()->get('service.cron.file'));
-$cronJob  = ExpandPath(Config()->get('service.cron.job'));
-
-$serviceSrc  = ExpandPath(Config()->get('service.systemd.file'));
-$serviceDest = ExpandPath(Config()->get('service.systemd.service'));
+$cronJob      = ExpandPath(Config()->get('service.cron.job'));
+$serviceDest  = ExpandPath(Config()->get('service.systemd.service'));
+$logrotateJob = ExpandPath(Config()->get('service.logrotate.job'));
 
 $serviceName = pathinfo($serviceDest, PATHINFO_FILENAME);
 
 $commands = [
     "systemctl stop $serviceName",
     "systemctl disable $serviceName",
-    "rm $cronJob", 
+    "rm $cronJob",
     "rm $serviceDest",
+    "rm $logrotateJob",
     '',
 ];
 
