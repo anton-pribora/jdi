@@ -51,7 +51,9 @@ $env = [
     'JDI_RUN'  => $runId,
 ];
 
-$process  = proc_open($task->command(), $descriptorspec, $pipes, null, $env);
+$pwd = $task->extra()->get('pwd');
+
+$process  = proc_open($task->command(), $descriptorspec, $pipes, $pwd, $env);
 $exitCode = proc_close($process);
 
 // Если скрипт выполняся долго, а база данных ждала мало, то соединение могло отвалиться

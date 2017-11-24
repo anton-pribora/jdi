@@ -16,6 +16,11 @@ class Extra extends BasicData implements \JsonSerializable
         $this->data[$key] = $value;
     }
     
+    public function get($key, $default = NULL)
+    {
+        return $this->data[$key] ?? $default;
+    }
+    
     public function remove($key)
     {
         unset($this->data[$key]);

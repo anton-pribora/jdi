@@ -44,6 +44,7 @@ $task->setCommand(join(' ', $command));
 $task->setDate(mysql_datetime());
 $task->setRunAt(mysql_datetime());
 $task->setStatusAndSave(Task::STATUS_ADDING);
+$task->extra()->set('pwd', getcwd());
 
 if ($stdin && !feof($stdin)) {
     $task->stdin()->touch();
