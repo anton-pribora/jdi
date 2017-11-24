@@ -10,14 +10,18 @@ $this->execute($action, ['onlyCommands' => $onlyCommands]);
 $cronFile = ExpandPath(Config()->get('service.cron.file'));
 $cronJob  = ExpandPath(Config()->get('service.cron.job'));
 
+$logrotateFile = ExpandPath(Config()->get('service.logrotate.file'));
+$logrotateJob  = ExpandPath(Config()->get('service.logrotate.job'));
+
 $serviceSrc  = ExpandPath(Config()->get('service.systemd.file'));
 $serviceDest = ExpandPath(Config()->get('service.systemd.service'));
 
 $serviceName = pathinfo($serviceDest, PATHINFO_FILENAME);
 
 $commands = [
-    "cp $cronFile $cronJob", 
-    "cp $serviceSrc $serviceDest",
+    "cp '$cronFile' '$cronJob'",
+    "cp '$logrotateFile' '$logrotateJob'",
+    "cp '$serviceSrc' '$serviceDest'",
     "systemctl enable $serviceName",
     "systemctl start $serviceName",
     '',

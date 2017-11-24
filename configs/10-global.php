@@ -44,6 +44,11 @@ Config()->setup([
                 '13 5 * * *  root @exec clean',
             ],
         ],
+        
+        'logrotate' => [
+            'file' => '@sys/logrotate.conf',
+            'job'  => '/etc/logrotate.d/@service'
+        ]
     ],
     
     'limit' => [
