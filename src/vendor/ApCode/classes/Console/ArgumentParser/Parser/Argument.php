@@ -11,6 +11,7 @@ class Argument
     
     private $shortOpts;
     private $longOpts;
+    private $matchOpts;
     
     public function __construct($definition)
     {
@@ -24,10 +25,14 @@ class Argument
         
         $this->shortOpts = [];
         $this->longOpts  = [];
+        $this->matchOpts = [];
         
         foreach ($tokens as $token) {
             if (preg_match('~^--[\w-]+$~u', $token)) {
                 $this->longOpts[$token] = ltrim($token, '-');
+                continue;
+            } elseif (preg_match('~^--[\w\*-]+$~u', $token)) {
+                $this->matchOpts[$token] = ltrim($token, '-');
                 continue;
             } elseif (preg_match('~^-\w$~u', $token)) {
                 $this->shortOpts[] = ltrim($token, '-');
@@ -46,11 +51,16 @@ class Argument
                     break;
                     
                 default:
-                    throw new Exception(sprintf("Неверный токен `%s' для определения параметра парсера аргументов", $token));
+                    throw new Exception(sprintf("Неверный токен `%s' для определения параметра парсера аргументов. Объявление: '%s'", $token, $this->definition));
                     break;
             }
         }
+        
+        if ($this->matchOpts && $this->isMultiple()) {
+            throw new Exception(sprintf("Нельзя использовать '+' с шаблонными аргументами. Объявление: '%s'", $this->definition));
+        }
     }
+    
     
     public function shortOpts()
     {
@@ -60,6 +70,11 @@ class Argument
     public function longOpts()
     {
         return $this->longOpts;
+    }
+    
+    public function matchOpts()
+    {
+        return $this->matchOpts;
     }
     
     public function isContainer()

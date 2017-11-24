@@ -136,7 +136,7 @@ class RunRepository
             return $default;
         };
 
-        $orderBy[] = '"id" DESC';
+        $orderBy[] = '"id" ASC';
         
         if (empty($params['order_by'])) {
             unset($params['order_by']);

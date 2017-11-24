@@ -18,13 +18,17 @@ class Result
         $this->opts[$id] = $value;
     }
     
-    public function addOpt($id, $value)
+    public function addOpt($id, $value, $key = NULL)
     {
         if (!isset($this->opts[$id])) {
             $this->opts[$id] = [];
         }
         
-        $this->opts[$id][] = $value;
+        if (isset($key)) {
+            $this->opts[$id][$key] = $value;
+        } else {
+            $this->opts[$id][] = $value;
+        }
     }
     
     public function opts()

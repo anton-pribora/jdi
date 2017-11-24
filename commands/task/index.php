@@ -6,10 +6,24 @@ use ApCode\Console\ArgumentParser\ArgumentParser;
 /* @var $this ApCode\Executor\RuntimeInterface */
 
 $params = [
+    'json'   => '--json',
+    'ready'  => '--ready',
+    'cancel' => '--cancel',
+    'remove' => '--remove',
     
+    'set'    => '--set-*',
+    'unset'  => '--unset-*',
 ];
 
 $options = (new ArgumentParser($params))->parse($this->paramList());
+
+if ($options->hasUnknowns()) {
+    printf("Неверные параметры %s. Используйте %s для справки.\n", 
+        join(', ', array_keys($options->unknowns())),
+        ExpandPath('@app help @command')
+    );
+    exit(-2);
+}
 
 $taskId = $options->arguments();
 
@@ -18,37 +32,60 @@ if (empty($taskId)) {
     return false;
 }
 
-$printTask = function (Task $task) {
-?>
-Задание #<?=$task->id()?> 
-Добалено: <?=$task->date()?> 
-Дата выполнения <?=$task->runAt()?> 
-количество провальных запусков: <?=$task->fails() ?? '-'?> 
-Команда: <?=$task->command()?> 
-STDIN: <?=$task->stdin()->exists() ? $task->stdin()->path() : 'нет'?> 
-Дополнительные данные: <?=$task->extra()->exists() ? $task->extra()->__toString() : 'нет'?> 
-
-<?php
-    foreach ($task->runs() as $run) {
-?>
-Запуск #<?=$run->id()?> 
-Начало выполнения: <?=$run->start()?> 
-Окончание выполнения: <?=$run->end()?> 
-Код завершения: <?=$run->exitCode()?> 
-STDOUT: <?=$run->stdout()->exists() ? $run->stdout()->path() : 'нет'?> 
-STDERR: <?=$run->stderr()->exists() ? $run->stderr()->path() : 'нет'?> 
-
-<?php
-    }
-};
+$do = ExpandPath('@command/do');
+$printJson = [];
 
 foreach ($taskId as $id) {
-    $task = Task::getInstance($id);
+    $task  = Task::getInstance($id);
+    $print = true;
     
     if (empty($task->id())) {
-        printf("Задание #%s не найдено\n", $id);
+        if ($options->hasOpt('json')) {
+            ;
+        } else {
+            printf("Задание #%s не найдено\n", $id);
+        }
         continue;
     }
     
-    $printTask($task);
+    if ($options->hasOpt('ready')) {
+        $this->execute("$do/ready.php", $task);
+        $print = false;
+    }
+    
+    if ($options->hasOpt('remove')) {
+        $this->execute("$do/remove.php", $task);
+        $print = false;
+    }
+    
+    if ($options->hasOpt('cancel')) {
+        $this->execute("$do/cancel.php", $task);
+        $print = false;
+    }
+    
+    if ($options->hasOpt('set')) {
+        $this->execute("$do/set.php", $task, $options->opt('set'));
+        $print = false;
+    }
+    
+    if ($options->hasOpt('unset')) {
+        $this->execute("$do/unset.php", $task, $options->opt('unset'));
+        $print = false;
+    }
+    
+    if ($print) {
+        if ($options->hasOpt('json')) {
+            $printJson[] = $task;
+        } else {
+            $this->execute("$do/print.php", $task);
+        }
+    }
+}
+
+if ($printJson) {
+    if (count($taskId) === 1) {
+        echo json_encode_array_pretty_print($task), PHP_EOL;
+    } else {
+        echo json_encode_array_pretty_print($printJson), PHP_EOL;
+    }
 }

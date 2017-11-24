@@ -4,7 +4,7 @@ namespace Jdi\Task;
 
 use Data\BlobFile;
 
-class Run extends RunBase
+class Run extends RunBase implements \JsonSerializable
 {
     private $stdout;
     private $stderr;
@@ -38,5 +38,17 @@ class Run extends RunBase
     public function delete()
     {
         return RunRepository::delete($this);
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id'       => $this->id(),
+            'start'    => js_datetime($this->start()),
+            'end'      => js_datetime($this->end()),
+            'exitCode' => $this->exitCode(),
+//             'stdout'   => $this->stdout()->exists() ? $this->stdout()->path() : false,
+//             'stderr'   => $this->stderr()->exists() ? $this->stderr()->path() : false,
+        ];
     }
 }

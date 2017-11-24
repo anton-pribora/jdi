@@ -38,8 +38,8 @@ class ArgumentParser
     private $result;
     
     private $shortOpts;
-    
     private $longOpts;
+    private $matchOpts;
     
     public function __construct(array $config = [])
     {
@@ -54,7 +54,10 @@ class ArgumentParser
     
     private function parseConfig()
     {
-        $this->items = [];
+        $this->items     = [];
+        $this->shortOpts = [];
+        $this->longOpts  = [];
+        $this->matchOpts = [];
         
         foreach ($this->config as $id => $config) {
             $item = new Parser\Argument($config);
@@ -74,6 +77,14 @@ class ArgumentParser
                 }
                 
                 $this->longOpts[$opt] = $id;
+            }
+            
+            foreach ($item->matchOpts() as $opt) {
+                if (isset($this->matchOpts[$opt])) {
+                    throw new Parser\Exception("Дублирующийся параметр `--%s'", $opt);
+                }
+                
+                $this->matchOpts[$opt] = $id;
             }
         }
     }
@@ -116,6 +127,13 @@ class ArgumentParser
                         $this->result->setOpt($id, $value);
                     }
                 } else {
+                    foreach ($this->matchOpts as $pattern => $id) {
+                        if (fnmatch($pattern, $key)) {
+                            $this->result->addOpt($id, $value, $key);
+                            continue 2;
+                        }
+                    }
+                    
                     $this->result->addUnknown("--$key", $value);
                 }
             } elseif (preg_match('~^-\w~u', $arg)) {

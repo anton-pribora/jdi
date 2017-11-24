@@ -74,6 +74,8 @@ if (empty($task->id()) || empty($run->id())) {
 
 $run->setExitCode($exitCode);
 $run->setEnd(mysql_datetime());
+$run->stderr()->removeIfEmpty();
+$run->stdout()->removeIfEmpty();
 
 $run->save();
 

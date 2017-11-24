@@ -19,3 +19,11 @@ function jdi_next() {
         file_put_contents($socket, "next\n");
     }
 }
+
+function js_datetime($time) {
+    if (!is_numeric($time)) {
+        $time = strtotime($time);
+    }
+    
+    return date(DateTime::RFC2822, $time);
+}

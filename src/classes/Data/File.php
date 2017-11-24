@@ -30,6 +30,15 @@ class File
         touch($this->path);
     }
     
+    public function size()
+    {
+        if ($this->exists()) {
+            return filesize($this->path);
+        }
+        
+        return null;
+    }
+    
     public function exists()
     {
         return file_exists($this->path) && is_file($this->path);
@@ -42,5 +51,12 @@ class File
         }
         
         return null;
+    }
+    
+    public function removeIfEmpty()
+    {
+        if ($this->size() < 1) {
+            $this->remove();
+        }
     }
 }

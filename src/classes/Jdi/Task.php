@@ -4,13 +4,14 @@ namespace Jdi;
 
 use Data\BlobFile;
 
-class Task extends TaskBase
+class Task extends TaskBase implements \JsonSerializable
 {
     const STATUS_ADDING  = 'adding';
     const STATUS_READY   = 'ready';
     const STATUS_RUNNING = 'running';
     const STATUS_DONE    = 'done';
     const STATUS_FAIL    = 'fail';
+    const STATUS_CANCEL  = 'cancel';
     
     private $stdin = null;
     
@@ -52,5 +53,20 @@ class Task extends TaskBase
     public function delete()
     {
         TaskRepository::delete($this);
+    }
+    
+    
+    public function jsonSerialize()
+    {
+        return [
+            'id'      => $this->id(),
+            'command' => $this->command(),
+//             'stdin'   => $this->stdin()->exists() ? $this->stdin()->path() : false,
+            'date'    => js_datetime($this->date()),
+            'runAt'   => $this->runAt() ? js_datetime($this->runAt()) : null,
+            'status'  => $this->status(),
+            'data'    => $this->extra(),
+            'runs'    => $this->runs(),
+        ];
     }
 }
