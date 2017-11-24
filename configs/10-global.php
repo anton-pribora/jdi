@@ -21,17 +21,21 @@ Config()->setup([
     ],
     
     'service' => [
+        'name'   => 'jdi',  // Имя сервиса в системе
+        
         'server' => '@sys/server.sh',
-        'socket' => '@sys/jdi.sock',
+        'socket' => '@sys/server.sock',
         'next'   => '@exec next &',
         
         'systemd' => [
             'description' => 'Just Do it! Service',
-            'file'        => '@sys/jdi.service',
+            'file'        => '@sys/systemd.service',
+            'service'     => '/etc/systemd/system/@service.service',
         ],
         
         'cron' => [
-            'file'   => '@sys/jdi.cron',
+            'file'   => '@sys/cron',
+            'job'    => '/etc/cron.d/@service',
             'config' => [
                 '# Запуск следующего задания раз в минуту',
                 '* *  * * *  root @exec next',

@@ -8,14 +8,16 @@ $onlyCommands = $this->param(0) == '-c' || !posix_isatty(STDOUT);
 $this->execute($action, ['onlyCommands' => $onlyCommands]);
 
 $cronFile = ExpandPath(Config()->get('service.cron.file'));
-$cronJob  = pathinfo($cronFile, PATHINFO_FILENAME);
+$cronJob  = ExpandPath(Config()->get('service.cron.job'));
 
-$serviceFile = ExpandPath(Config()->get('service.systemd.file'));
-$serviceName = pathinfo($serviceFile, PATHINFO_FILENAME);
+$serviceSrc  = ExpandPath(Config()->get('service.systemd.file'));
+$serviceDest = ExpandPath(Config()->get('service.systemd.service'));
+
+$serviceName = pathinfo($serviceDest, PATHINFO_FILENAME);
 
 $commands = [
-    "cp $cronFile /etc/cron.d/$cronJob", 
-    "cp $serviceFile /etc/systemd/system/$serviceName.service",
+    "cp $cronFile $cronJob", 
+    "cp $serviceSrc $serviceDest",
     "systemctl enable $serviceName",
     "systemctl start $serviceName",
     '',
