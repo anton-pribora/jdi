@@ -1,6 +1,10 @@
 <?php
 
 Config()->setup([
+    'owner' => [
+        'user'  => 'root',
+        'group' => 'root',
+    ],
     'db' => [
         'dsn' => 'sqlite:@sys/database.sq3',
         

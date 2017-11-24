@@ -15,7 +15,7 @@ trap remove_fifo 2 3 6
 SOCKET={$socket}
 
 make_fifo() {
-    [ -f "\$SOCKET" ] || mkfifo "\$SOCKET"
+    [ -f "\$SOCKET" ] || mkfifo -m 0666 "\$SOCKET"
 }
 
 remove_fifo() {
@@ -28,7 +28,6 @@ make_fifo
 while :; do
     while read -r line; do
         case "\$line" in
-            exit) break 2;;
             next) $next;;
             *) echo Неизвестная команда \$line;;
         esac
