@@ -7,6 +7,7 @@ use ApCode\Console\ArgumentParser\ArgumentParser;
 
 $params = [
     'json'   => '--json',
+    'remove' => '--remove',
 ];
 
 $options = (new ArgumentParser($params))->parse($this->paramList());
@@ -31,7 +32,17 @@ if ($status) {
     $list = TaskRepository::findMany([]);
 }
 
-if ($list) {
+if ($options->hasOpt('remove')) {
+    foreach ($list as $task) {
+        $message = sprintf('Task #%s: Удаление задания', $task->id());
+        $task->delete();
+        
+        printf("%s\n", $message);
+        Logger()->log('common', $message);
+    }
+    
+    printf("Очередь очищена\n");
+} elseif ($list) {
     if ($options->hasOpt('json')) {
         echo json_encode_array_pretty_print($list), PHP_EOL;
     } else {

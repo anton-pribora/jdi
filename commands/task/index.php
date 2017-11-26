@@ -26,14 +26,19 @@ if ($options->hasUnknowns()) {
 }
 
 $taskId = $options->arguments();
+$printJson = [];
 
 if (empty($taskId)) {
-    printf("Необходимо указать номер задания\n");
+    if ($options->hasOpt('json')) {
+        echo json_encode_array_pretty_print($printJson), PHP_EOL;
+    } else {
+        printf("Необходимо указать номер задания\n");
+    }
+    
     return false;
 }
 
 $do = ExpandPath('@command/do');
-$printJson = [];
 
 foreach ($taskId as $id) {
     $task  = Task::getInstance($id);
@@ -82,10 +87,6 @@ foreach ($taskId as $id) {
     }
 }
 
-if ($printJson) {
-    if (count($taskId) === 1) {
-        echo json_encode_array_pretty_print($task), PHP_EOL;
-    } else {
-        echo json_encode_array_pretty_print($printJson), PHP_EOL;
-    }
+if ($printJson || $options->hasOpt('json')) {
+    echo json_encode_array_pretty_print($printJson), PHP_EOL;
 }

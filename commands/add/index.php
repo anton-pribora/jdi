@@ -19,7 +19,7 @@ foreach ($args as $i => $arg) {
     break;
 }
 
-$captureStdin = false;
+$captureStdin = !posix_isatty(STDIN);
 
 foreach ($params as $param) {
     switch ($param) {
@@ -56,13 +56,20 @@ if ($stdin && !feof($stdin)) {
     
     fclose($fp);
     fclose($stdin);
+    
+    $task->stdin()->removeIfEmpty();
 }
 
 $task->setStatusAndSave(Task::STATUS_READY);
 
 $message = sprintf("Task #%s: Добавлено задание для выполнения команды %s", $task->id(), $task->command());
 
-printf("%s\n", $message);
+if (posix_isatty(STDOUT)) {
+    printf("%s\n", $message);
+} else {
+    printf("%s\n", $task->id());
+}
+
 Logger()->log('common', $message);
 
 jdi_next();
