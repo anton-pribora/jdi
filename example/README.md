@@ -5,4 +5,4 @@
 с ограничением по количеству одновременно запущенных заданий. Как только одно задание заканчивается, запускается 
 следующее. 
 
-![Example](example.png) 
+![Example](https://raw.githubusercontent.com/anton-pribora/jdi/master/example/example.gif) 
