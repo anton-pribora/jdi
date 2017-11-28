@@ -52,7 +52,7 @@ Config()->setup([
     ],
     
     'limit' => [
-        'run_at_once' => 5,
+        'run_at_once' => 1,
         'fails'       => 3,
         'expire'      => [
             \Jdi\Task::STATUS_DONE    => '-1 day',

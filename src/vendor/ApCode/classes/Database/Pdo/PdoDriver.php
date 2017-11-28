@@ -42,6 +42,11 @@ class PdoDriver implements DatabaseInterface
         $this->pdo = new PDO($this->dsn, $this->login, $this->password, $this->options);
     }
     
+    public function disconnect()
+    {
+        $this->pdo = null;
+    }
+    
     public function pdo()
     {
         if (empty($this->pdo)) {

@@ -35,9 +35,14 @@ if ($result->hasOpt('port')) {
 $dsn[] = 'charset=utf8';
 
 $config = [
-    'dsn'      => 'mysql:'. join(';', $dsn),
-    'login'    => $result->opt('user', Config()->get('db.default.mysql.login')),
-    'password' => $result->opt('password', Config()->get('db.default.mysql.password')),
+    'db' => [
+        'dsn'      => 'mysql:'. join(';', $dsn),
+        'login'    => $result->opt('user', Config()->get('db.default.mysql.login')),
+        'password' => $result->opt('password', Config()->get('db.default.mysql.password')),
+    ],
+    'limits' => [
+        'run_at_once' => 5,
+    ],
 ];
 
 return $config;

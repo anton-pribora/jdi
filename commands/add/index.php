@@ -43,8 +43,9 @@ $task = new Task();
 $task->setCommand(join(' ', $command));
 $task->setDate(mysql_datetime());
 $task->setRunAt(mysql_datetime());
-$task->setStatusAndSave(Task::STATUS_ADDING);
 $task->extra()->set('pwd', getcwd());
+$task->extra()->set('pid', posix_getpid());
+$task->setStatusAndSave(Task::STATUS_ADDING);
 
 if ($stdin && !feof($stdin)) {
     $task->stdin()->touch();
@@ -60,7 +61,10 @@ if ($stdin && !feof($stdin)) {
     $task->stdin()->removeIfEmpty();
 }
 
+$task->extra()->remove('pid');
 $task->setStatusAndSave(Task::STATUS_READY);
+
+Db()->disconnect();
 
 $message = sprintf("Task #%s: Добавлено задание для выполнения команды %s", $task->id(), $task->command());
 

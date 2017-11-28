@@ -6,12 +6,13 @@ use Data\BlobFile;
 
 class Task extends TaskBase implements \JsonSerializable
 {
-    const STATUS_ADDING  = 'adding';
-    const STATUS_READY   = 'ready';
-    const STATUS_RUNNING = 'running';
-    const STATUS_DONE    = 'done';
-    const STATUS_FAIL    = 'fail';
-    const STATUS_CANCEL  = 'cancel';
+    const STATUS_ADDING      = 'adding';
+    const STATUS_READY       = 'ready';
+    const STATUS_RUNNING     = 'running';
+    const STATUS_DONE        = 'done';
+    const STATUS_FAIL        = 'fail';
+    const STATUS_CANCEL      = 'cancel';
+    const STATUS_INTERRUPTED = 'interrupted';
     
     private $stdin = null;
     

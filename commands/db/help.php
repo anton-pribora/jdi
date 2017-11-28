@@ -12,7 +12,7 @@ JDI DB   Help
 Команда
   install     Установка базы данных с текущими настройками конфига.
   reinstall   Удаление и повторная установка базы данных.
-  drop        Удаление базы данных.
+  remove      Удаление базы данных.
   setup       Установка настроек базы данных.
   
 Аргументы
@@ -42,4 +42,4 @@ JDI DB   Help
     % <?=ExpandPath('@app')?> db install
 
   Удаление базы данных:
-    % <?=ExpandPath('@app')?> db drop
+    % <?=ExpandPath('@app')?> db remove

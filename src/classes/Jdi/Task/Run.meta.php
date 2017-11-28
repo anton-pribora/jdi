@@ -55,8 +55,8 @@ return [
         'extra'    => [
             'field'  => 'extra',
             'title'  => NULL,
-            'encode' => NULL,
-            'decode' => NULL,
+            'encode' => 'json_encode_array',
+            'decode' => 'json_decode_array',
         ],
     ],
 ];

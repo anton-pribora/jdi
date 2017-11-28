@@ -7,6 +7,10 @@ namespace Jdi\Task;
  */
 abstract class RunBase extends \ApCode\Billet\AbstractBillet
 {
+    protected $data = [
+        'extra' => []
+    ];
+    
     public function id()
     {
         return $this->data['id'] ?? null;
@@ -84,14 +88,11 @@ abstract class RunBase extends \ApCode\Billet\AbstractBillet
         return $this;
     }
 
+    /**
+     * @return \Jdi\Task\Extra
+     */
     public function extra()
     {
-        return $this->data['extra'] ?? null;
-    }
-
-    public function setExtra($value)
-    {
-        $this->data['extra'] = $value;
-        return $this;
+        return new Extra($this->data['extra']);
     }
 }

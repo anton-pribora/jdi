@@ -2,10 +2,11 @@
 
 /* @var $this ApCode\Executor\RuntimeInterface */
 
-$socket = ExpandPath(Config()->get('service.socket'));
-$next   = ExpandPath(Config()->get('service.next'));
+$socket = escapeshellarg(Config()->get('service.socket'));
+$next   = Config()->get('service.next');
+$limit  = Config()->get('limit.run_at_once');
 
-$socket = escapeshellarg($socket);
+$preStart = join(PHP_EOL, array_fill(0, $limit, $next));
 
 $code = <<<SH
 #!/bin/bash
@@ -24,6 +25,10 @@ remove_fifo() {
 }
 
 make_fifo
+
+@exec check
+
+$preStart
 
 while :; do
     while read -r line; do
@@ -44,5 +49,5 @@ if (!$this->param('onlyCommands')) {
     printf("Запись файла %s\n", $file);
 }
 
-file_put_contents($file, $code);
+file_put_contents($file, ExpandPath($code));
 chmod($file, 0755);

@@ -19,7 +19,12 @@ $dsn = [
 ];
 
 $config = [
-    'dsn' => 'sqlite:'. join(';', $dsn),
+    'db' => [
+        'dsn' => 'sqlite:'. join(';', $dsn),
+    ],
+    'limits' => [
+        'run_at_once' => 1,
+    ],
 ];
 
 return $config;

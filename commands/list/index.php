@@ -46,9 +46,9 @@ if ($options->hasOpt('remove')) {
     if ($options->hasOpt('json')) {
         echo json_encode_array_pretty_print($list), PHP_EOL;
     } else {
-        printf("ID      Дата создания        Дата запуска          Статус  Команда\n");
+        printf("ID      Дата создания        Дата запуска        Статус       PID    Команда\n");
         foreach ($list as $item) {
-            printf("% 6s  %10s  %10s % 8s  %s\n", $item->id(), $item->date(), $item->runAt(), $item->status(), $item->command());
+            printf("% 6s  %10s  %10s % -11s  % -6s %s\n", $item->id(), $item->date(), $item->runAt(), $item->status(), $item->extra()->get('pid'), $item->command());
         }
     }
 } else {

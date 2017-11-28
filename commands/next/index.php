@@ -24,6 +24,7 @@ if (!$task) {
 
 printf("Task #%s: Выполняем задание\n", $task->id());
 
+$task->extra()->set('pid', posix_getpid());
 $task->setStatusAndSave(Task::STATUS_RUNNING);
 
 $run = $task->makeNewRun();
@@ -53,13 +54,23 @@ $env = [
 
 $pwd = $task->extra()->get('pwd');
 
-$process  = proc_open($task->command(), $descriptorspec, $pipes, $pwd, $env);
+$process = proc_open($task->command(), $descriptorspec, $pipes, $pwd, $env);
+
+if (is_resource($process)) {
+    $status = proc_get_status($process);
+    
+    $run->extra()->set('pid', $status['pid']);
+    $run->save();
+    
+    Db()->disconnect();
+}
+
 $exitCode = proc_close($process);
 
-// Если скрипт выполняся долго, а база данных ждала мало, то соединение могло отвалиться
+// Повторно соединяемся с базой
 Db()->checkConnection();
 
-// На всякий пожарный перезагружаем объекты из базы данных, чтобы не потерять изменения,
+// Перезагружаем объекты из базы данных, чтобы не потерять изменения,
 // которые могли произойти во время выполнения задания
 BilletRepository::clearCache();
 
@@ -78,8 +89,11 @@ $run->setExitCode($exitCode);
 $run->setEnd(mysql_datetime());
 $run->stderr()->removeIfEmpty();
 $run->stdout()->removeIfEmpty();
+$run->extra()->remove('pid');
 
 $run->save();
+
+$task->extra()->remove('pid');
 
 if ($exitCode > 0 || $exitCode < 0) {
     $task->setFails($task->fails() + 1);
@@ -99,5 +113,7 @@ if ($exitCode > 0 || $exitCode < 0) {
 
 printf("%s\n", $message);
 Logger()->log('common', $message);
+
+Db()->disconnect();
 
 jdi_next();
