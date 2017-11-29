@@ -3,6 +3,7 @@
 /* @var $this ApCode\Executor\RuntimeInterface */
 
 $command = $this->param(0);
+$app     = app();
 
 if ($command) {
     $help = "$command/help.php";
@@ -12,7 +13,7 @@ if ($command) {
         exit(-1);
     }
     
-    printf("Не найдена справочная информация для `jdi.php %s'. Используте `jdi.php help' для справки.\n", $command);
+    printf("Не найдена справочная информация для `$app %s'. Используте `$app help' для справки.\n", $command);
     exit(-1);
 }
 
@@ -31,6 +32,6 @@ foreach (glob(ExpandPath('@commands/*'), GLOB_ONLYDIR) as $folder) {
 
 ?>
 
-Используйте `jdi.php help КОМАНДА' для получения справки по конкретной команде.
+Используйте `<?=$app?> help КОМАНДА' для получения справки по конкретной команде.
 <?php
 exit(-1);
