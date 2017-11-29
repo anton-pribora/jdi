@@ -4,7 +4,7 @@
 
 $this->executeOnce(ExpandPath('@command/install/server.php'), $this->paramList());
 
-$serviceFile = ExpandPath(Config()->get('service.systemd.file'));
+$serviceFile = ExpandPath(Config()->get('service.systemd.local'));
 $servceName = pathinfo($serviceFile, PATHINFO_FILENAME);
 
 ob_start();
@@ -14,7 +14,7 @@ Description=<?=Config()->get('servicce.systemd.description')?>
 
 [Service]
 Type=simple
-ExecStart=<?=ExpandPath(Config()->get('service.server'))?> 
+ExecStart=<?=ExpandPath(Config()->get('service.server.dest'))?> 
 KillSignal=6
 
 [Install]

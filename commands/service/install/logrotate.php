@@ -2,7 +2,7 @@
 
 /* @var $this ApCode\Executor\RuntimeInterface */
 
-$file   = ExpandPath(Config()->get('service.logrotate.file'));
+$file   = ExpandPath(Config()->get('service.logrotate.local'));
 
 ob_start();
 ?>

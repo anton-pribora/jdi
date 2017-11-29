@@ -3,7 +3,7 @@
 /* @var $this ApCode\Executor\RuntimeInterface */
 
 $config = Config()->get('service.cron.config');
-$file   = ExpandPath(Config()->get('service.cron.file'));
+$file   = ExpandPath(Config()->get('service.cron.local'));
 
 $content = join(PHP_EOL, $config) . PHP_EOL;
 $content = ExpandPath($content);

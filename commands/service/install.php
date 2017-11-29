@@ -7,20 +7,24 @@ $onlyCommands = $this->param(0) == '-c' || !posix_isatty(STDOUT);
 
 $this->execute($action, ['onlyCommands' => $onlyCommands]);
 
-$cronFile = ExpandPath(Config()->get('service.cron.file'));
-$cronJob  = ExpandPath(Config()->get('service.cron.job'));
+$cronFile = ExpandPath(Config()->get('service.cron.local'));
+$cronJob  = ExpandPath(Config()->get('service.cron.dest'));
 
-$logrotateFile = ExpandPath(Config()->get('service.logrotate.file'));
-$logrotateJob  = ExpandPath(Config()->get('service.logrotate.job'));
+$logrotateFile = ExpandPath(Config()->get('service.logrotate.local'));
+$logrotateJob  = ExpandPath(Config()->get('service.logrotate.dest'));
 
-$serviceSrc  = ExpandPath(Config()->get('service.systemd.file'));
-$serviceDest = ExpandPath(Config()->get('service.systemd.service'));
+$serviceSrc  = ExpandPath(Config()->get('service.systemd.local'));
+$serviceDest = ExpandPath(Config()->get('service.systemd.dest'));
+
+$serverSrc  = ExpandPath(Config()->get('service.server.local'));
+$serverDest = ExpandPath(Config()->get('service.server.dest'));
 
 $serviceName = pathinfo($serviceDest, PATHINFO_FILENAME);
 
 $commands = [
     "cp '$cronFile' '$cronJob'",
     "cp '$logrotateFile' '$logrotateJob'",
+    "cp '$serverSrc' '$serverDest'",
     "cp '$serviceSrc' '$serviceDest'",
     "systemctl enable $serviceName",
     "systemctl start $serviceName",

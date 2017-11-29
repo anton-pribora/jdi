@@ -2,8 +2,8 @@
 
 Config()->setup([
     'owner' => [
-        'user'  => 'root',
-        'group' => 'root',
+        'user'  => 'www-data',
+        'group' => 'www-data',
     ],
     'db' => [
         'dsn' => 'sqlite:@sys/database.sq3',
@@ -22,20 +22,23 @@ Config()->setup([
     
     'service' => [
         'name'   => 'jdi',  // Имя сервиса в системе
-        
-        'server' => '@sys/server.sh',
         'socket' => '@sys/server.sock',
         'next'   => '@exec next &',
         
+        'server' => [
+            'local' => '@sys/server.sh',
+            'dest'  => '/usr/local/bin/@service-server.sh',
+        ],
+        
         'systemd' => [
             'description' => 'Just Do it! Service',
-            'file'        => '@sys/systemd.service',
-            'service'     => '/etc/systemd/system/@service.service',
+            'local'       => '@sys/systemd.service',
+            'dest'        => '/etc/systemd/system/@service.service',
         ],
         
         'cron' => [
-            'file'   => '@sys/cron',
-            'job'    => '/etc/cron.d/@service',
+            'local'  => '@sys/cron',
+            'dest'   => '/etc/cron.d/@service',
             'config' => [
                 '# Запуск следующего задания раз в минуту',
                 '* *  * * *  root @exec next',
@@ -46,19 +49,17 @@ Config()->setup([
         ],
         
         'logrotate' => [
-            'file' => '@sys/logrotate.conf',
-            'job'  => '/etc/logrotate.d/@service'
+            'local' => '@sys/logrotate.conf',
+            'dest'  => '/etc/logrotate.d/@service'
         ]
     ],
     
     'limit' => [
-        'run_at_once' => 1,
+        'run_at_once' => 1,  // Для sqlite это оптимальное значение!
         'fails'       => 3,
         'expire'      => [
             \Jdi\Task::STATUS_DONE    => '-1 day',
-            \Jdi\Task::STATUS_ADDING  => '-7 days',
             \Jdi\Task::STATUS_READY   => '-7 days',
-            \Jdi\Task::STATUS_RUNNING => '-7 days',
             \Jdi\Task::STATUS_FAIL    => '-7 days',
             
             'any' => '-1 month',
