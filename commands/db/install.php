@@ -16,6 +16,12 @@ switch ($driver) {
         $int        = 'INTEGER';
         break;
         
+    case 'pgsql':
+        $primaryKey = 'SERIAL PRIMARY KEY';
+        $int        = 'INT';
+        $datetime   = 'TIMESTAMP WITHOUT TIME ZONE';
+        break;
+        
     case 'mysql':
         $primaryKey = 'INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY';
         $engine     = 'ENGINE MyISAM DEFAULT CHARSET=utf8';

@@ -43,7 +43,7 @@ class RunRepository
         }
         
         if ($pagination && $pagination->limit()) {
-            $sql .= ' LIMIT '. intval($pagination->startFrom()) .', '. intval($pagination->limit());
+            $sql .= ' LIMIT '. intval($pagination->limit()) .' OFFSET '. intval($pagination->startFrom());
         }
 
         $idList = Db()->query($sql)->fetchColumn();

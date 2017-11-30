@@ -26,6 +26,15 @@ JDI DB   Help
         --port=порт, -P порт            Порт подключения.
         БАЗА_ДАННЫХ                     Имя базы данных (по умолчанию <?=Config()->get('db.default.mysql.database')?>).
       
+    postgres [ПАРАМЕТРЫ] [БАЗА_ДАННЫХ]
+      Задаёт настройки подключения к базе данных MySQL.
+      Параметры:
+        --user=имя, -u имя              Имя пользователя для подключения к базе данных.
+        --password=пароль, -p пароль    Пароль для подключения к базе данных.
+        --host=хост, -h хост            Адрес подключения к базе данных.
+        --port=порт, -P порт            Порт подключения.
+        БАЗА_ДАННЫХ                     Имя базы данных (по умолчанию <?=Config()->get('db.default.postgres.database')?>).
+      
     sqlite [ИМЯ_ФАЙЛА]
       Задаёт настройки подключения к базе SQLite.
       Аргументы:
@@ -35,6 +44,10 @@ JDI DB   Help
 Примеры использования
   Установка базы данных MySql:
     % <?=ExpandPath('@app')?> db setup mysql -utest -ptest -hlocalhost just_do_it
+    % <?=ExpandPath('@app')?> db install
+    
+  Установка базы данных PostgreSQL:
+    % <?=ExpandPath('@app')?> db setup postgres -utest -ptest -hlocalhost just_do_it
     % <?=ExpandPath('@app')?> db install
     
   Установка базы данных SQLite:

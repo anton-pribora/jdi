@@ -17,6 +17,11 @@ Config()->setup([
                 'login'    => 'test',
                 'password' => 'test',
             ],
+            'postgres' => [
+                'database' => 'just_do_it',
+                'login'    => 'test',
+                'password' => 'test',
+            ],
         ],
     ],
     

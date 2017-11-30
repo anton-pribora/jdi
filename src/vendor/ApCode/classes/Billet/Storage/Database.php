@@ -90,6 +90,9 @@ class Database implements StorageInterface
         }
         
         if ($isNewRecord) {
+            $billetValues = $billet->getValuesForDb();
+            $idValue      = $billetValues[$idProp];
+            
             $sql = $meta->get('sql.billet.insert');
             
             if (empty($sql)) {
@@ -97,6 +100,10 @@ class Database implements StorageInterface
                 $values = [];
                 
                 foreach ($dbmap as $prop => $field) {
+                    if ($prop == $idProp && empty($idValue)) {
+                        continue;
+                    }
+                    
                     if (is_array($field)) {
                         $field = $field['field'];
                     }
@@ -109,8 +116,8 @@ class Database implements StorageInterface
                 $meta->set('sql.billet.insert', $sql);
             }
             
-            if (empty($billetValues)) {
-                $billetValues = $billet->getValuesForDb();
+            if (empty($idValue)) {
+                unset($billetValues[$idProp]);
             }
             
             $stm = $this->db->query($sql, $billetValues);
