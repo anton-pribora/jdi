@@ -31,11 +31,6 @@ function Module($name) : \ApCode\Executor\ExecutorInterface {
     return $modules[$name];
 }
 
-function Run($command, ...$argsAndLastParams) {
-    list($module, $action) = explode('/', 2) + [null, null];
-    return Module($module)->execute($action, ...$argsAndLastParams);
-}
-
 function RunOnce($command, ...$argsAndLastParams) {
     list($module, $action) = explode('/', $command, 2) + [null, null];
     return Module($module)->executeOnce($action, ...$argsAndLastParams);
