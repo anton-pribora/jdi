@@ -6,7 +6,7 @@ use Jdi\Task;
 
 $args    = $this->paramList();
 $params  = [];
-$command = [];
+$commandArray = [];
 
 foreach ($args as $i => $arg) {
     if (substr($arg, 0, 2) == '--') {
@@ -15,7 +15,7 @@ foreach ($args as $i => $arg) {
         continue;
     }
     
-    $command = $args;
+    $commandArray = $args;
     break;
 }
 
@@ -39,8 +39,43 @@ if ($captureStdin) {
     $stdin = false;
 }
 
+$command = $commandArray[0] ?? '';
+
+if (empty($command)) {
+    printf("Пустая команда\n");
+    exit(-1);
+}
+
+$fullPath = exec('which '. escapeshellarg($command));
+
+if (empty($fullPath)) {
+    printf("Не удалось установить полный путь к команде %s\n", escapeshellarg($command));
+    exit(-1);
+}
+
+$fullPath = realpath($fullPath);
+$matched = false;
+
+foreach (Config()->get('allow_exec', []) as $pattern) {
+    if (fnmatch($pattern, $fullPath)) {
+        $matched = true;
+        break;
+    }
+}
+
+if (!$matched) {
+    printf("Команда %s не разрешена к выполнению\n", escapeshellarg($fullPath));
+    exit(-1);
+}
+
+$commandArray[0] = $fullPath;
+
+foreach ($commandArray as $i => $argument) {
+    $commandArray[$i] = escapeshellarg($argument);
+}
+
 $task = new Task();
-$task->setCommand(join(' ', $command));
+$task->setCommand(join(' ', $commandArray));
 $task->setDate(mysql_datetime());
 $task->setRunAt(mysql_datetime());
 $task->extra()->set('pwd', getcwd());

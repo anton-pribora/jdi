@@ -5,6 +5,11 @@ Config()->setup([
         'user'  => 'www-data',
         'group' => 'www-data',
     ],
+    
+    'allow_exec' => [
+        '*',
+    ],
+    
     'db' => [
         'dsn' => 'sqlite:@sys/database.sq3',
         

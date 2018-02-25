@@ -22,7 +22,27 @@ if (!$task) {
     return false;
 }
 
-printf("Task #%s: Выполняем задание\n", $task->id());
+$command = escapeshellcmd($task->command());
+$matched = false;
+
+foreach (Config()->get('allow_exec', []) as $pattern) {
+    if (fnmatch($pattern, trim($command, '"\''))) {
+        $matched = true;
+        break;
+    }
+}
+
+if (!$matched) {
+    $message = sprintf("Task #%s: Выполнение задания не разрешено конфигом allow_exec", $task->id());
+    
+    printf("%s\n", $message);
+    Logger()->log('common', $message);
+    
+    $task->setStatusAndSave(Task::STATUS_FORBIDDEN);
+    exit(-2);
+}
+
+printf("Task #%s: Выполняем задание $command\n", $task->id());
 
 $task->extra()->set('pid', posix_getpid());
 $task->setStatusAndSave(Task::STATUS_RUNNING);
@@ -54,7 +74,7 @@ $env = [
 
 $pwd = $task->extra()->get('pwd');
 
-$process = proc_open($task->command(), $descriptorspec, $pipes, $pwd, $env);
+$process = proc_open($command, $descriptorspec, $pipes, $pwd, $env);
 
 if (is_resource($process)) {
     $status = proc_get_status($process);
