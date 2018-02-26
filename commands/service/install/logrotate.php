@@ -2,7 +2,8 @@
 
 /* @var $this ApCode\Executor\RuntimeInterface */
 
-$file   = ExpandPath(Config()->get('service.logrotate.local'));
+$file = ExpandPath(Config()->get('service.logrotate.local'));
+$job  = ExpandPath(Config()->get('service.logrotate.dest'));
 
 ob_start();
 ?>
@@ -20,3 +21,7 @@ if (!$this->param('onlyCommands')) {
 }
 
 file_put_contents($file, $config);
+
+return [
+    "cp '$file' '$job'",
+];

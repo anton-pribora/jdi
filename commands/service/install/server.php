@@ -2,6 +2,9 @@
 
 /* @var $this ApCode\Executor\RuntimeInterface */
 
+$serverSrc  = ExpandPath(Config()->get('service.server.local'));
+$serverDest = ExpandPath(Config()->get('service.server.dest'));
+
 $socket = escapeshellarg(Config()->get('service.socket'));
 $next   = Config()->get('service.next');
 $limit  = Config()->get('limit.run_at_once');
@@ -16,11 +19,11 @@ trap remove_fifo 2 3 6
 SOCKET={$socket}
 
 make_fifo() {
-    [ -f "\$SOCKET" ] || mkfifo -m 0666 "\$SOCKET"
+    [ -p "\$SOCKET" ] || mkfifo -m 0666 "\$SOCKET"
 }
 
 remove_fifo() {
-    unlink "\$SOCKET"
+    rm -f "\$SOCKET"
     exit 1
 }
 
@@ -48,11 +51,15 @@ remove_fifo
 SH
 ;
 
-$file = ExpandPath(Config()->get('service.server.local'));
+$serverSrc = ExpandPath(Config()->get('service.server.local'));
 
 if (!$this->param('onlyCommands')) {
-    printf("Запись файла %s\n", $file);
+    printf("Запись файла %s\n", $serverSrc);
 }
 
-file_put_contents($file, ExpandPath($code));
-chmod($file, 0755);
+file_put_contents($serverSrc, ExpandPath($code));
+chmod($serverSrc, 0755);
+
+return [
+    "cp '$serverSrc' '$serverDest'",
+];

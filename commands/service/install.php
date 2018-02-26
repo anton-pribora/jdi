@@ -1,38 +1,57 @@
 <?php
 
+use ApCode\Console\ArgumentParser\ArgumentParser;
+
 /* @var $this ApCode\Executor\RuntimeInterface */
 
-$action = ExpandPath("@command/install/all.php");
-$onlyCommands = $this->param(0) == '-c' || !posix_isatty(STDOUT);
-
-$this->execute($action, ['onlyCommands' => $onlyCommands]);
-
-$cronFile = ExpandPath(Config()->get('service.cron.local'));
-$cronJob  = ExpandPath(Config()->get('service.cron.dest'));
-
-$logrotateFile = ExpandPath(Config()->get('service.logrotate.local'));
-$logrotateJob  = ExpandPath(Config()->get('service.logrotate.dest'));
-
-$serviceSrc  = ExpandPath(Config()->get('service.systemd.local'));
-$serviceDest = ExpandPath(Config()->get('service.systemd.dest'));
-
-$serverSrc  = ExpandPath(Config()->get('service.server.local'));
-$serverDest = ExpandPath(Config()->get('service.server.dest'));
-
-$serviceName = pathinfo($serviceDest, PATHINFO_FILENAME);
-
-$commands = [
-    "cp '$cronFile' '$cronJob'",
-    "cp '$logrotateFile' '$logrotateJob'",
-    "cp '$serverSrc' '$serverDest'",
-    "cp '$serviceSrc' '$serviceDest'",
-    "systemctl enable $serviceName",
-    "systemctl start $serviceName",
-    '',
+$params = [
+    'onlyCommands' => '-c',
 ];
 
+$options = (new ArgumentParser($params))->parse($this->paramList());
+
+if ($options->hasUnknowns()) {
+    printf("Неверные параметры %s. Используйте %s для справки.\n", 
+        join(', ', array_keys($options->unknowns())),
+        ExpandPath('@app help @command')
+    );
+    exit(-2);
+}
+
+$onlyCommands = $options->hasOpt('onlyCommands') || !posix_isatty(STDOUT);
+
+$list = $options->arguments();
+
+if (empty($list)) {
+    $list = ['cron', 'logrotate', exec('which systemd') ? 'systemd' : 'inetd'];
+}
+
+$commands = [];
+
+foreach ($list as $service) {
+    $action = ExpandPath("@command/install/$service.php");
+    
+    if (!$this->canExecute($action, $this->paramList())) {
+        printf("Неверный параметр %s. Используйте %s для справки.\n", 
+            $service,
+            ExpandPath('@app help @command')
+        );
+        exit(-2);
+    }
+    
+    $result = $this->executeOnce($action, [
+        'onlyCommands' => $onlyCommands,
+    ] + $this->paramList());
+    
+    if ($result === true) {
+        continue;
+    }
+    
+    $commands = array_merge($commands, $result);
+}
+
 if ($onlyCommands) {
-    echo join(PHP_EOL, $commands);
+    echo join(PHP_EOL, $commands), PHP_EOL;
     return ;
 }
 
@@ -42,7 +61,8 @@ if ($onlyCommands) {
 
 <?=join(PHP_EOL, $commands)?>
 
+
 Для проверки статуса сервиса используйте:
 
-service <?=$serviceName?> status
+service <?=Config()->get('service.name')?> status
 

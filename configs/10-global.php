@@ -46,6 +46,13 @@ Config()->setup([
             'dest'        => '/etc/systemd/system/@service.service',
         ],
         
+        'inetd' => [
+            'name'        => '@service',
+            'description' => 'Just Do it! Service',
+            'local'       => '@sys/inetd.script',
+            'dest'        => '/etc/init.d/@service',
+        ],
+        
         'cron' => [
             'local'  => '@sys/cron',
             'dest'   => '/etc/cron.d/@service',

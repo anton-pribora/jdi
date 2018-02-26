@@ -2,15 +2,20 @@
 
 /* @var $this ApCode\Executor\RuntimeInterface */
 
-$this->executeOnce(ExpandPath('@command/install/server.php'), $this->paramList());
+$commands = $this->executeOnce(ExpandPath('@command/install/server.php'), $this->paramList()) ?: [];
+
+if ($commands === true) {
+    $commands = [];
+}
 
 $serviceFile = ExpandPath(Config()->get('service.systemd.local'));
-$servceName = pathinfo($serviceFile, PATHINFO_FILENAME);
+$serviceDest = ExpandPath(Config()->get('service.systemd.dest'));
+$serviceName = pathinfo($serviceFile, PATHINFO_FILENAME);
 
 ob_start();
 ?>
 [Unit]
-Description=<?=Config()->get('servicce.systemd.description')?> 
+Description=<?=Config()->get('service.systemd.description')?> 
 
 [Service]
 Type=simple
@@ -27,3 +32,9 @@ if (!$this->param('onlyCommands')) {
 }
 
 file_put_contents($serviceFile, $config);
+
+$commands[] = "cp '$serviceFile' '$serviceDest'";
+$commands[] = "systemctl enable $serviceName";
+$commands[] = "systemctl start $serviceName";
+
+return $commands;

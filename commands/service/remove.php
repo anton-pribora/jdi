@@ -1,32 +1,62 @@
 <?php
 
+use ApCode\Console\ArgumentParser\ArgumentParser;
+
 /* @var $this ApCode\Executor\RuntimeInterface */
-$onlyCommands = $this->param(0) == '-c' || !posix_isatty(STDOUT);
 
-$cronJob      = ExpandPath(Config()->get('service.cron.dest'));
-$serviceDest  = ExpandPath(Config()->get('service.systemd.dest'));
-$serverDest   = ExpandPath(Config()->get('service.server.dest'));
-$logrotateJob = ExpandPath(Config()->get('service.logrotate.dest'));
-
-$serviceName = pathinfo($serviceDest, PATHINFO_FILENAME);
-
-$commands = [
-    "systemctl stop $serviceName",
-    "systemctl disable $serviceName",
-    "rm '$cronJob'",
-    "rm '$serviceDest'",
-    "rm '$logrotateJob'",
-    "rm '$serverDest'",
-    '',
+$params = [
+    'onlyCommands' => '-c',
 ];
 
+$options = (new ArgumentParser($params))->parse($this->paramList());
+
+if ($options->hasUnknowns()) {
+    printf("Неверные параметры %s. Используйте %s для справки.\n", 
+        join(', ', array_keys($options->unknowns())),
+        ExpandPath('@app help @command')
+    );
+    exit(-2);
+}
+
+$onlyCommands = $options->hasOpt('onlyCommands') || !posix_isatty(STDOUT);
+
+$list = $options->arguments();
+
+if (empty($list)) {
+    $list = ['cron', 'logrotate', exec('which systemd') ? 'systemd' : 'inetd'];
+}
+
+$commands = [];
+
+foreach ($list as $service) {
+    $action = ExpandPath("@command/remove/$service.php");
+    
+    if (!$this->canExecute($action, $this->paramList())) {
+        printf("Неверный параметр %s. Используйте %s для справки.\n", 
+            $service,
+            ExpandPath('@app help @command')
+        );
+        exit(-2);
+    }
+    
+    $result = $this->executeOnce($action, [
+        'onlyCommands' => $onlyCommands,
+    ] + $this->paramList());
+    
+    if ($result === true) {
+        continue;
+    }
+    
+    $commands = array_merge($commands, $result);
+}
+
 if ($onlyCommands) {
-    echo join(PHP_EOL, $commands);
+    echo join(PHP_EOL, $commands), PHP_EOL;
     return ;
 }
 
 ?>
-Для удаления сервиса приложения выполните следующе команды от суперпользователя:
+Для удаления системных настроек выполните под логином суперпользователя следующие команды:
 
 <?=join(PHP_EOL, $commands)?>
 
