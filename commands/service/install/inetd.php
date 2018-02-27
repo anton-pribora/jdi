@@ -33,7 +33,7 @@ PIDFILE=/var/run/<?php echo $serviceName?>.pid
 LOGFILE=/var/log/<?php echo $serviceName?>.log
 
 start() {
-  if [ -f /var/run/$PIDNAME ] && kill -0 $(cat /var/run/$PIDNAME); then
+  if [ -f $PIDFILE ] && kill -0 $(cat $PIDFILE); then
     echo 'Service already running' >&2
     return 1
   fi
@@ -55,7 +55,7 @@ stop() {
 }
 
 status() {
-  if [ -f /var/run/$PIDNAME ] && kill -0 $(cat /var/run/$PIDNAME); then
+  if [ -f $PIDFILE ] && kill -0 $(cat $PIDFILE); then
     echo 'Service running' >&2
     return 0
   fi
