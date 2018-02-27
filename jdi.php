@@ -28,13 +28,13 @@ $action  = $command .'/index.php';
 
 $executor = new PhpFileExecutor(ExpandPath('@commands'));
 
+PathAlias()->set('@exec', __FILE__);
+PathAlias()->set('@app' , './'. basename(__FILE__));
+
 if ($executor->canExecute($action, $params)) {
-    PathAlias()->set('@exec'   , __FILE__);
-    PathAlias()->set('@app'    , './'. basename(__FILE__));
     PathAlias()->set('@command', $command);
-    
     $executor->execute($action, $params);
 } else {
-    printf("Command `%s' does not exist. Try `%s help' for more information.\n", $command, app());
+    printf("Command `%s' does not exist. Try `%s help' for more information.\n", $command, ExpandPath(app()));
     exit(-1);
 }

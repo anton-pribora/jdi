@@ -8,11 +8,16 @@ $serviceName = pathinfo($serviceFile, PATHINFO_FILENAME);
 ?>
 JDI LIST   Help
 
-Управление сервисом
+Управление списоком заданий
 
 Синопсис
   
-  <?=app()?> list [all|done|fail|ready|running]
+  <?=app()?> list [--json|--remove] [all|done|fail|ready|running]
+
+Параметры
+  
+  --json    Вывод списка в формате JSON
+  --remove  Удалить задания из списка
   
 Описание
 

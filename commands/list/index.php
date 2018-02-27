@@ -51,6 +51,8 @@ if ($options->hasOpt('remove')) {
             printf("% 6s  %10s  %10s % -11s  % -6s %s\n", $item->id(), $item->date(), $item->runAt(), $item->status(), $item->extra()->get('pid'), $item->command());
         }
     }
+} elseif ($options->hasOpt('json')) {
+    echo json_encode_array([]);
 } else {
     printf("Нет подходящих заданий\n");
 }
