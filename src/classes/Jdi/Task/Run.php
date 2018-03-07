@@ -48,8 +48,8 @@ class Run extends RunBase implements \JsonSerializable
             'end'      => js_datetime($this->end()),
             'exitCode' => $this->exitCode(),
             'data'     => $this->extra(),
-//             'stdout'   => $this->stdout()->exists() ? $this->stdout()->path() : false,
-//             'stderr'   => $this->stderr()->exists() ? $this->stderr()->path() : false,
+            'stdout'   => $this->stdout()->exists() ? $this->stdout()->path() : false,
+            'stderr'   => $this->stderr()->exists() ? $this->stderr()->path() : false,
         ];
     }
 }
