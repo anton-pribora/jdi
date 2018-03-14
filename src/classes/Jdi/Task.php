@@ -20,7 +20,7 @@ class Task extends TaskBase implements \JsonSerializable
     function stdin()
     {
         if (empty($this->stdin)) {
-            $this->stdin = new BlobFile(parent::stdin());
+            $this->stdin = new BlobFile(parent::stdin(), 'stdin/');
             
             if (empty(parent::stdin())) {
                 parent::setStdin($this->stdin->guid());

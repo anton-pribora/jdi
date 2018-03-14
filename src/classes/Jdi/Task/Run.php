@@ -12,7 +12,7 @@ class Run extends RunBase implements \JsonSerializable
     function stdout()
     {
         if (empty($this->stdout)) {
-            $this->stdout = new BlobFile(parent::stdout());
+            $this->stdout = new BlobFile(parent::stdout(), 'stdout/');
             
             if (empty(parent::stdout())) {
                 parent::setStdout($this->stdout->guid());
@@ -25,7 +25,7 @@ class Run extends RunBase implements \JsonSerializable
     function stderr()
     {
         if (empty($this->stderr)) {
-            $this->stderr = new BlobFile(parent::stderr());
+            $this->stderr = new BlobFile(parent::stderr(), 'stderr/');
             
             if (empty(parent::stderr())) {
                 parent::setStderr($this->stderr->guid());
