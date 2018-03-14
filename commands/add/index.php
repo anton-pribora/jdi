@@ -9,7 +9,7 @@ $params  = [];
 $owners  = [];
 $commandArray = [];
 
-$captureStdin = !posix_isatty(STDIN);
+$captureStdin = defined('STDIN') && is_resource(STDIN) && fstat(STDIN)['ctime'] && !posix_isatty(STDIN);
 
 $splitOwners = function ($str) {
     return preg_split('/[\s,;]+/', $str, null, PREG_SPLIT_NO_EMPTY);
