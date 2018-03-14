@@ -54,6 +54,11 @@ $createTable "jdi_task_run" (
     "exit_code" $varchar,
     "extra" $text
 ) $engine;
+
+$createTable "jdi_task_owner" (
+    "task_id" $int,
+    "owner" $varchar
+) $engine;
 SQL
 ;
 

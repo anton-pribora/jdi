@@ -8,9 +8,14 @@ use ApCode\Console\ArgumentParser\ArgumentParser;
 $params = [
     'json'   => '--json',
     'remove' => '--remove',
+    'owner'  => '-o, --owner, =, +',
 ];
 
 $options = (new ArgumentParser($params))->parse($this->paramList());
+
+$splitOwners = function ($str) {
+    return preg_split('/[\s,;]+/', $str, null, PREG_SPLIT_NO_EMPTY);
+};
 
 if ($options->hasUnknowns()) {
     printf("Неверные параметры %s. Используйте %s для справки.\n", 
@@ -26,11 +31,23 @@ if (in_array('all', $status)) {
     $status = [];
 }
 
-if ($status) {
-    $list = TaskRepository::findMany(['status' => $status]);
-} else {
-    $list = TaskRepository::findMany([]);
+$owners = [];
+
+foreach ($options->opt('owner', []) as $value) {
+    $owners = array_merge($owners, $splitOwners($value));
 }
+
+$where = [];
+
+if ($status) {
+    $where['status'] = $status;
+}
+
+if ($owners) {
+    $where['owner'] = $owners;
+}
+
+$list = TaskRepository::findMany($where);
 
 if ($options->hasOpt('remove')) {
     foreach ($list as $task) {
@@ -46,9 +63,9 @@ if ($options->hasOpt('remove')) {
     if ($options->hasOpt('json')) {
         echo json_encode_array_pretty_print($list), PHP_EOL;
     } else {
-        printf("ID      Дата создания        Дата запуска        Статус       PID    Команда\n");
+        printf("ID      Дата создания        Дата запуска        Статус       PID    Владелец  Команда\n");
         foreach ($list as $item) {
-            printf("% 6s  %10s  %10s % -11s  % -6s %s\n", $item->id(), $item->date(), $item->runAt(), $item->status(), $item->extra()->get('pid'), $item->command());
+            printf("% 6s  %10s  %10s % -11s  % -6s %-9s %s\n", $item->id(), $item->date(), $item->runAt(), $item->status(), $item->extra()->get('pid'), join(',', $item->owners()), $item->command());
         }
     }
 } elseif ($options->hasOpt('json')) {

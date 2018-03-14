@@ -3,6 +3,7 @@
 namespace Jdi;
 
 use Data\BlobFile;
+use Jdi\Task\OwnerRepository;
 
 class Task extends TaskBase implements \JsonSerializable
 {
@@ -27,6 +28,25 @@ class Task extends TaskBase implements \JsonSerializable
         }
         
         return $this->stdin;
+    }
+    
+    public function owners()
+    {
+        return OwnerRepository::findMany(['taskId' => $this->id()]);
+    }
+    
+    public function addOwners($owners)
+    {
+        foreach ((array) $owners as $value) {
+            if (mb_strlen($value)) {
+                OwnerRepository::insert($this, $value);
+            }
+        }
+    }
+    
+    public function removeOwners($owners = NULL)
+    {
+        return OwnerRepository::delete($this, $owners);
     }
     
     public function setStatusAndSave($value)
@@ -56,13 +76,12 @@ class Task extends TaskBase implements \JsonSerializable
         TaskRepository::delete($this);
     }
     
-    
     public function jsonSerialize()
     {
         return [
             'id'      => $this->id(),
             'command' => $this->command(),
-//             'stdin'   => $this->stdin()->exists() ? $this->stdin()->path() : false,
+            'owners'  => $this->owners(),
             'date'    => js_datetime($this->date()),
             'runAt'   => $this->runAt() ? js_datetime($this->runAt()) : null,
             'status'  => $this->status(),

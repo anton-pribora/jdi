@@ -3,6 +3,7 @@
 $sql = <<<SQL
 DROP TABLE IF EXISTS "jdi_task";
 DROP TABLE IF EXISTS "jdi_task_run";
+DROP TABLE IF EXISTS "jdi_task_owner";
 SQL
 ;
 

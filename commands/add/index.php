@@ -6,31 +6,45 @@ use Jdi\Task;
 
 $args    = $this->paramList();
 $params  = [];
+$owners  = [];
 $commandArray = [];
-
-foreach ($args as $i => $arg) {
-    if (substr($arg, 0, 2) == '--') {
-        $params[] = $arg;
-        unset($args[$i]);
-        continue;
-    }
-    
-    $commandArray = $args;
-    break;
-}
 
 $captureStdin = !posix_isatty(STDIN);
 
-foreach ($params as $param) {
-    switch ($param) {
-        case '--stdin':
-            $captureStdin = true;
-            break;
-            
-        default:
-            printf("Неизвестный параметр `%s'\n", $param);
-            exit(-1);
+$splitOwners = function ($str) {
+    return preg_split('/[\s,;]+/', $str, null, PREG_SPLIT_NO_EMPTY);
+};
+
+while ($args) {
+    $arg = array_shift($args);
+    
+    if ($arg == '--stdin') {
+        $captureStdin = true;
+        continue;
     }
+    
+    if ($arg == '-o') {
+        $owners = array_merge($owners, $splitOwners(array_shift($args)));
+        continue;
+    }
+    
+    if (preg_match('~--owner=(.*)~', $arg, $matches)) {
+        $owners = array_merge($owners, $splitOwners($matches[1]));
+        continue;
+    }
+    
+    if ($arg == '--') {
+        $commandArray = array_merge($commandArray, $args);
+        break;
+    }
+    
+    if (substr($arg, 0, 2) == '--') {
+        printf("Неизвестный параметр `%s'\n", $arg);
+        exit(-1);
+    }
+    
+    $commandArray = array_merge([$arg], $args);
+    break;
 }
 
 if ($captureStdin) {
@@ -81,6 +95,10 @@ $task->setRunAt(mysql_datetime());
 $task->extra()->set('pwd', getcwd());
 $task->extra()->set('pid', posix_getpid());
 $task->setStatusAndSave(Task::STATUS_ADDING);
+
+if ($owners) {
+    $task->addOwners($owners);
+}
 
 if ($stdin && !feof($stdin)) {
     $task->stdin()->touch();

@@ -87,6 +87,9 @@ class TaskRepository
         
         $sql = 'DELETE FROM "'. Task::tableName() .'" WHERE "id" = ? LIMIT 1';
         $res = Db()->query($sql, [$task->id()]);
+        
+        $sql = 'DELETE FROM "jdi_task_owner" WHERE "task_id" = ?';
+        $res = Db()->query($sql, [$task->id()]);
     }
 
     private static function buildWhere(&$params)
@@ -112,6 +115,27 @@ class TaskRepository
         if (isset($params['run_at<='])) {
             $where[] = '"run_at" <= '. Db()->quote($params['run_at<=']);
             unset($params['run_at<=']);
+        }
+        
+        if (isset($params['owner'])) {
+            $clause = [];
+            
+            foreach ((array) $params['owner'] as $value) {
+                $array[] = '"owner" LIKE '. Db()->quote($value);
+            }
+            
+            $sql = 'SELECT "task_id" FROM "jdi_task_owner" WHERE ' . join(' OR ', $array);
+            $res = Db()->query($sql);
+            
+            $values = $res->fetchColumn();
+            
+            if ($values) {
+                $where[] = '"id" IN ('. join(', ', $values) .')';
+            } else {
+                $where[] = '0';
+            }
+            
+            unset($params['owner']);
         }
         
         return $where;
