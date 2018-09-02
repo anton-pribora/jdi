@@ -10,7 +10,7 @@ if ($commands === true) {
 
 $serviceFile = ExpandPath(Config()->get('service.systemd.local'));
 $serviceDest = ExpandPath(Config()->get('service.systemd.dest'));
-$serviceName = pathinfo($serviceFile, PATHINFO_FILENAME);
+$serviceName = pathinfo($serviceDest, PATHINFO_FILENAME);
 
 ob_start();
 ?>
